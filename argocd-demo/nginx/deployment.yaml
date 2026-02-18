@@ -12,8 +12,27 @@ spec:
       labels:
         app: nginx-demo
     spec:
+      volumes:
+        - name: shared-data
+          emptyDir: { }
       containers:
       - name: nginx
         image: nginx
         ports:
         - containerPort: 80
+        volumeMounts:
+        - name: shared-data
+          mountPath: /usr/share/nginx/html
+      - name: sidecar-container
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            while true; do
+              date >> /data/index.html
+              sleep 5
+            done
+        volumeMounts:
+        - name: shared-data
+          mountPath: /data
